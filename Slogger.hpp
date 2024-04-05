@@ -3,15 +3,16 @@
 #include <cstdio>
 #include <chrono>
 #include <string>
+#include <mutex>
 
 class Slogger {
 public:
     static bool EnableFileLogging(const std::string& filename) {
         Slogger& inst = self();
+        std::lock_guard<std::mutex> lock_guard(inst.mutex);
         inst.file = fopen(filename.c_str(), "a");
         
-        inst.file_logging = inst.file != nullptr;
-        return inst.file_logging;
+        return inst.file != nullptr;
     }
 
     template<typename... _Args>
@@ -49,6 +50,7 @@ private:
     template<typename... _Args>
     static void log(LogLevel log_level, const char* fmt_str, _Args&&... args) {
         Slogger& inst = self();
+        std::lock_guard<std::mutex> lock_guard(inst.mutex);
         time_t raw = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
         std::string str_time = ctime(&raw);
         str_time.pop_back();
@@ -58,7 +60,7 @@ private:
                 printf(fmt_str, args...);
                 printf("\n");
 
-                if(inst.file_logging == true) {
+                if(inst.file != nullptr) {
                     fprintf(inst.file, "[%s DEBUG] ", str_time.c_str());
                     fprintf(inst.file, fmt_str, args...);
                     fprintf(inst.file, "\n");
@@ -70,7 +72,7 @@ private:
                 printf(fmt_str, args...);
                 printf("\n");
 
-                if(inst.file_logging == true) {
+                if(inst.file != nullptr) {
                     fprintf(inst.file, "[%s INFO] ", str_time.c_str());
                     fprintf(inst.file, fmt_str, args...);
                     fprintf(inst.file, "\n");
@@ -82,7 +84,7 @@ private:
                 printf(fmt_str, args...);
                 printf("\n");
 
-                if(inst.file_logging == true) {
+                if(inst.file != nullptr) {
                     fprintf(inst.file, "[%s WARNING] ", str_time.c_str());
                     fprintf(inst.file, fmt_str, args...);
                     fprintf(inst.file, "\n");
@@ -94,7 +96,7 @@ private:
                 printf(fmt_str, args...);
                 printf("\n");
 
-                if(inst.file_logging == true) {
+                if(inst.file != nullptr) {
                     fprintf(inst.file, "[%s ERROR] ", str_time.c_str());
                     fprintf(inst.file, fmt_str, args...);
                     fprintf(inst.file, "\n");
@@ -105,12 +107,11 @@ private:
     }
 
     ~Slogger() {
-        Slogger& inst = self();
-        if(inst.file != nullptr) {
-            fclose(inst.file);
+        if(file != nullptr) {
+            fclose(file);
         }
     }
 
-    bool file_logging;
     FILE* file;
+    std::mutex mutex;
 };
