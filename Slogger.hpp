@@ -17,22 +17,22 @@ public:
 
     template<typename... _Args>
     static void Debug(const char* fmt_str, _Args&&... args) {
-        log(DEBUG, fmt_str, args...);
+        self().log(DEBUG, fmt_str, args...);
     }
 
     template<typename... _Args>
     static void Info(const char* fmt_str, _Args&&... args) {
-        log(INFO, fmt_str, args...);
+        self().log(INFO, fmt_str, args...);
     }
 
     template<typename... _Args>
     static void Warning(const char* fmt_str, _Args&&... args) {
-        log(WARNING, fmt_str, args...);
+        self().log(WARNING, fmt_str, args...);
     }
 
     template<typename... _Args>
     static void Error(const char* fmt_str, _Args&&... args) {
-        log(ERROR, fmt_str, args...);
+        self().log(ERROR, fmt_str, args...);
     }
 private:
     static Slogger& self() {
@@ -48,9 +48,8 @@ private:
     };
 
     template<typename... _Args>
-    static void log(LogLevel log_level, const char* fmt_str, _Args&&... args) {
-        Slogger& inst = self();
-        std::lock_guard<std::mutex> lock_guard(inst.mutex);
+    void log(LogLevel log_level, const char* fmt_str, _Args&&... args) {
+        std::lock_guard<std::mutex> lock_guard(mutex);
         time_t raw = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
         std::string str_time = ctime(&raw);
         str_time.pop_back();
@@ -60,10 +59,10 @@ private:
                 printf(fmt_str, args...);
                 printf("\n");
 
-                if(inst.file != nullptr) {
-                    fprintf(inst.file, "[%s DEBUG] ", str_time.c_str());
-                    fprintf(inst.file, fmt_str, args...);
-                    fprintf(inst.file, "\n");
+                if(file != nullptr) {
+                    fprintf(file, "[%s DEBUG] ", str_time.c_str());
+                    fprintf(file, fmt_str, args...);
+                    fprintf(file, "\n");
                 }
                 break;
             }
@@ -72,10 +71,10 @@ private:
                 printf(fmt_str, args...);
                 printf("\n");
 
-                if(inst.file != nullptr) {
-                    fprintf(inst.file, "[%s INFO] ", str_time.c_str());
-                    fprintf(inst.file, fmt_str, args...);
-                    fprintf(inst.file, "\n");
+                if(file != nullptr) {
+                    fprintf(file, "[%s INFO] ", str_time.c_str());
+                    fprintf(file, fmt_str, args...);
+                    fprintf(file, "\n");
                 }
                 break;
             }
@@ -84,10 +83,10 @@ private:
                 printf(fmt_str, args...);
                 printf("\n");
 
-                if(inst.file != nullptr) {
-                    fprintf(inst.file, "[%s WARNING] ", str_time.c_str());
-                    fprintf(inst.file, fmt_str, args...);
-                    fprintf(inst.file, "\n");
+                if(file != nullptr) {
+                    fprintf(file, "[%s WARNING] ", str_time.c_str());
+                    fprintf(file, fmt_str, args...);
+                    fprintf(file, "\n");
                 }
                 break;
             }
@@ -96,10 +95,10 @@ private:
                 printf(fmt_str, args...);
                 printf("\n");
 
-                if(inst.file != nullptr) {
-                    fprintf(inst.file, "[%s ERROR] ", str_time.c_str());
-                    fprintf(inst.file, fmt_str, args...);
-                    fprintf(inst.file, "\n");
+                if(file != nullptr) {
+                    fprintf(file, "[%s ERROR] ", str_time.c_str());
+                    fprintf(file, fmt_str, args...);
+                    fprintf(file, "\n");
                 }
                 break;
             }
