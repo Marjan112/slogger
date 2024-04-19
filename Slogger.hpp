@@ -4,6 +4,8 @@
 #include <chrono>
 #include <string>
 #include <mutex>
+#include <cstdarg>
+#include <cassert>
 
 class Slogger {
 public:
@@ -56,53 +58,62 @@ private:
         switch(log_level) {
             case DEBUG: {
                 printf("[%s DEBUG] ", str_time.c_str());
-                printf(fmt_str, args...);
+                log_format(stdout, fmt_str, args...);
                 printf("\n");
 
                 if(file != nullptr) {
                     fprintf(file, "[%s DEBUG] ", str_time.c_str());
-                    fprintf(file, fmt_str, args...);
+                    log_format(file, fmt_str, args...);
                     fprintf(file, "\n");
                 }
                 break;
             }
             case INFO: {
                 printf("[%s INFO] ", str_time.c_str());
-                printf(fmt_str, args...);
+                log_format(stdout, fmt_str, args...);
                 printf("\n");
 
                 if(file != nullptr) {
                     fprintf(file, "[%s INFO] ", str_time.c_str());
-                    fprintf(file, fmt_str, args...);
+                    log_format(file, fmt_str, args...);
                     fprintf(file, "\n");
                 }
                 break;
             }
             case WARNING: {
                 printf("[%s WARNING] ", str_time.c_str());
-                printf(fmt_str, args...);
+                log_format(stdout, fmt_str, args...);
                 printf("\n");
 
                 if(file != nullptr) {
                     fprintf(file, "[%s WARNING] ", str_time.c_str());
-                    fprintf(file, fmt_str, args...);
+                    log_format(file, fmt_str, args...);
                     fprintf(file, "\n");
                 }
                 break;
             }
             case ERROR: {
                 printf("[%s ERROR] ", str_time.c_str());
-                printf(fmt_str, args...);
+                log_format(stdout, fmt_str, args...);
                 printf("\n");
 
                 if(file != nullptr) {
                     fprintf(file, "[%s ERROR] ", str_time.c_str());
-                    fprintf(file, fmt_str, args...);
+                    log_format(file, fmt_str, args...);
                     fprintf(file, "\n");
                 }
                 break;
             }
         }
+    }
+
+    void log_format(FILE* file, const char* fmt_str...) {
+        assert(file != NULL);
+
+        va_list args;
+        va_start(args, fmt_str);
+        vfprintf(file, fmt_str, args);
+        va_end(args);
     }
 
     ~Slogger() {
