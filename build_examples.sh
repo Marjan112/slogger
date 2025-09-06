@@ -1,2 +1,2 @@
-g++ -o debug examples/debug.cpp
-g++ -o info examples/info.cpp
+g++ -o debug examples/debug.cpp -std=c++23
+g++ -o info examples/info.cpp -std=c++23

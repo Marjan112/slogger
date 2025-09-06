@@ -9,7 +9,7 @@ void producer() {
     for(int i = 0; i < 10; ++i) {
         std::lock_guard<std::mutex> lock_guard(queue_mutex);
         data_queue.push(i);
-        Slogger::Debug("Produced: %d", i);
+        Slogger::Debug("Produced: {}", i);
         std::this_thread::sleep_for(std::chrono::seconds(1));
     }
 }
@@ -20,7 +20,7 @@ void consumer() {
         if(!data_queue.empty()) {
             int consumed = data_queue.front();
             data_queue.pop();
-            Slogger::Debug("Consumed: %d", consumed);
+            Slogger::Debug("Consumed: {}", consumed);
         }
         std::this_thread::sleep_for(std::chrono::seconds(1));
     }

@@ -3,9 +3,9 @@
 #include "../Slogger.hpp"
 
 void thread_function(int id) {
-    Slogger::Info("Thread %d is starting", id);
+    Slogger::Info("Thread {} is starting", id);
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
-    Slogger::Info("Thread %d is finishing", id);
+    Slogger::Info("Thread {} is finishing", id);
 }
 
 int main() {
