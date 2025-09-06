@@ -15,7 +15,7 @@ void producer() {
     for(int i = 0; i < 10; ++i) {
         std::lock_guard<std::mutex> lock_guard(queue_mutex);
         data_queue.push(i);
-        Slogger::Debug("Produced: %d", i);
+        Slogger::Debug("Produced: {}", i);
         std::this_thread::sleep_for(std::chrono::seconds(1));
     }
 }
@@ -26,7 +26,7 @@ void consumer() {
         if(!data_queue.empty()) {
             int consumed = data_queue.front();
             data_queue.pop();
-            Slogger::Debug("Consumed: %d", consumed);
+            Slogger::Debug("Consumed: {}", consumed);
         }
         std::this_thread::sleep_for(std::chrono::seconds(1));
     }
@@ -50,9 +50,9 @@ int main() {
 #include "../Slogger.hpp"
 
 void thread_function(int id) {
-    Slogger::Info("Thread %d is starting", id);
+    Slogger::Info("Thread {} is starting", id);
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
-    Slogger::Info("Thread %d is finishing", id);
+    Slogger::Info("Thread {} is finishing", id);
 }
 
 int main() {
